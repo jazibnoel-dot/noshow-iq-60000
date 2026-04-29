@@ -1,7 +1,7 @@
 noshow-iq-60000
 ==============================
 
-A mid term Project
+A mid term Project of Jazib
 
 Project Organization
 ------------
