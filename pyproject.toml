@@ -1,0 +1,18 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "noshowiq-YOURSAPID"
+version = "0.1.0"
+description = "Patient appointment no-show prediction API"
+requires-python = ">=3.11"
+dependencies = [
+    "fastapi", "uvicorn", "pymongo", "pandas",
+    "scikit-learn", "imbalanced-learn", "joblib",
+    "python-dotenv", "pydantic",
+]
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["noshow_iq*"]
