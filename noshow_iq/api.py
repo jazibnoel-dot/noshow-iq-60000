@@ -62,14 +62,13 @@ model = None
 # ── FIX: Load the model when the server starts ──────────────────────────────
 @app.on_event("startup")
 def startup_event():
+    """Load model when the API starts"""
     global model
     try:
         model = get_model()
-        print("✅ Model loaded successfully.")
-    except FileNotFoundError as e:
-        print(f"❌ Model load failed: {e}")
+        print("✓ Model loaded successfully")
     except Exception as e:
-        print(f"❌ Unexpected error loading model: {e}")
+        print(f"✗ Warning: Could not load model on startup: {e}")
 # ─────────────────────────────────────────────────────────────────────────────
 
 
