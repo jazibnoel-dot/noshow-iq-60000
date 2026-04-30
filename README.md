@@ -66,4 +66,55 @@ Project Organization
 
 --------
 
+API Usage
+---------
+
+Start the FastAPI app and then send a POST request to `/predict` with JSON input. The service derives the model features from the appointment timestamps.
+
+Start the app with `uvicorn`:
+
+```powershell
+uvicorn noshow_iq.api:app --host 0.0.0.0 --port 7860
+```
+
+Then send a request.
+
+Example PowerShell request:
+
+```powershell
+$body = @{
+  age = 45
+  gender = "F"
+  scheduled_day = "2025-04-10T08:00:00"
+  appointment_day = "2025-04-20T10:00:00"
+  scholarship = 0
+  hipertension = 1
+  diabetes = 0
+  alcoholism = 0
+  handcap = 0
+  sms_received = 1
+} | ConvertTo-Json
+
+Invoke-RestMethod -Uri http://localhost:7860/predict -Method Post -Body $body -ContentType "application/json"
+```
+
+If you prefer `curl.exe` in PowerShell:
+
+```powershell
+curl.exe -X POST http://localhost:7860/predict `
+  -H "Content-Type: application/json" `
+  -d '{
+    "age": 45,
+    "gender": "F",
+    "scheduled_day": "2025-04-10T08:00:00",
+    "appointment_day": "2025-04-20T10:00:00",
+    "scholarship": 0,
+    "hipertension": 1,
+    "diabetes": 0,
+    "alcoholism": 0,
+    "handcap": 0,
+    "sms_received": 1
+  }'
+```
+
 <p><small>Project based on the <a target="_blank" href="https://drivendata.github.io/cookiecutter-data-science/">cookiecutter data science project template</a>. #cookiecutterdatascience</small></p>
