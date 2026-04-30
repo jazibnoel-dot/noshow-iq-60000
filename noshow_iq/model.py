@@ -73,7 +73,7 @@ def train(X, y, db=None):
     print("========================\n")
 
     # Create folder if it doesn't exist and save the model
-    MODEL_PATH.parent.mkdir(exist_ok=True)
+    os.makedirs(MODEL_PATH.parent, exist_ok=True)
     joblib.dump(model, MODEL_PATH)
     print(f"Model saved to {MODEL_PATH}")
 
@@ -92,20 +92,8 @@ def train(X, y, db=None):
 
 
 def load_model():
-    """
-    Load the saved machine learning model from disk.
-
-    Raises an error if the model file does not exist.
-
-    Returns:
-    model: Trained model loaded from file
-    """
-
-    # Check if model file exists
-    if not MODEL_PATH.exists():
+    if not os.path.exists(MODEL_PATH):   # ← fix: call os.path.exists(), not .exists()
         raise FileNotFoundError(f"No model at {MODEL_PATH}. Run train.py first.")
-
-    # Load and return the model
     return joblib.load(MODEL_PATH)
 
 
