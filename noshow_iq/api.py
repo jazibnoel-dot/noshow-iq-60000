@@ -59,6 +59,20 @@ def get_model():
 model = None
 
 
+# ── FIX: Load the model when the server starts ──────────────────────────────
+@app.on_event("startup")
+def startup_event():
+    global model
+    try:
+        model = get_model()
+        print("✅ Model loaded successfully.")
+    except FileNotFoundError as e:
+        print(f"❌ Model load failed: {e}")
+    except Exception as e:
+        print(f"❌ Unexpected error loading model: {e}")
+# ─────────────────────────────────────────────────────────────────────────────
+
+
 class AppointmentInput(BaseModel):
     age: int
     scholarship: int
@@ -87,19 +101,6 @@ def health():
 def predict(record: AppointmentInput):
     """
     Predict whether a patient will miss their appointment.
-
-    Steps:
-    1. Check if model is loaded.
-    2. Convert input data into DataFrame.
-    3. Run prediction using trained model.
-    4. Store result in MongoDB (if available).
-    5. Return prediction result.
-
-    Parameters:
-    record (AppointmentInput): Patient input data
-
-    Returns:
-    dict: Prediction result (risk level, probability, recommendation)
     """
 
     # If model is not loaded, return error
@@ -139,20 +140,12 @@ def predict(record: AppointmentInput):
 def history():
     """
     Get last 20 prediction records from database.
-
-    Returns:
-    list: Recent prediction records
     """
-
     try:
         db = get_db()
-
-        # Fetch last 20 predictions sorted by latest timestamp
         docs = list(db["predictions"].find({}, {"_id": 0}).sort("timestamp", -1).limit(20))
-
         return docs
     except Exception:
-        # Return empty list if database fails
         return []
 
 
@@ -160,22 +153,10 @@ def history():
 def stats():
     """
     Get summary statistics of predictions.
-
-    Includes:
-    - Total predictions
-    - High risk count
-    - Low risk count
-    - Average probability
-    - Last model training time
-
-    Returns:
-    dict: Statistics summary
     """
-
     try:
         db = get_db()
 
-        # MongoDB aggregation pipeline to calculate stats
         pipeline = [{"$group": {
             "_id": None,
             "total_predictions": {"$sum": 1},
@@ -184,31 +165,19 @@ def stats():
             "average_probability": {"$avg": "$probability"},
         }}]
 
-        # Execute aggregation
         result = list(db["predictions"].aggregate(pipeline))
-
-        # Get last training timestamp
         last_run = db["training_runs"].find_one({}, {"_id": 0, "timestamp": 1}, sort=[("timestamp", -1)])
 
         if result:
             data = result[0]
-
-            # Remove MongoDB internal ID
             data.pop("_id", None)
-
-            # Round probability value
             data["average_probability"] = round(data["average_probability"], 4)
-
-            # Add last training time
             data["last_trained"] = last_run["timestamp"].isoformat() if last_run else None
-
             return data
 
     except Exception:
-        # Ignore errors
         pass
 
-    # Default empty stats if something fails
     return {
         "total_predictions": 0,
         "high_risk_count": 0,
@@ -216,12 +185,3 @@ def stats():
         "average_probability": 0.0,
         "last_trained": None
     }
-@app.on_event("startup")
-def load_model_on_startup():
-    global model
-    from noshow_iq.model import load_model
-    try:
-        model = load_model()
-        print("✅ Model loaded")
-    except Exception as e:
-        print("❌ Model load failed:", e)
