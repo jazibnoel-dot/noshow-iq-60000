@@ -18,8 +18,11 @@ This script is usually run once to train the model.
 # Load environment variables from a .env file (if available)
 load_dotenv()
 
-# Path to the dataset file
-DATASET_PATH = "data/raw/KaggleV2-May-2016.csv"
+# Path to the dataset file. Defaults to the copied data path inside the container.
+DATASET_PATH = os.getenv(
+    "DATASET_PATH",
+    os.path.join(os.getcwd(), "data", "raw", "KaggleV2-May-2016.csv"),
+)
 
 # Step 1: Load and clean dataset
 print("Loading dataset...")
@@ -40,10 +43,15 @@ mongo_uri = os.getenv("MONGO_URI")
 
 # If MongoDB URI is provided, connect to database
 if mongo_uri:
-    from pymongo import MongoClient
-    client = MongoClient(mongo_uri)
-    db = client["noshowiq"]  # database name
-    print("Connected to MongoDB.")
+    try:
+        from pymongo import MongoClient
+        client = MongoClient(mongo_uri, serverSelectionTimeoutMS=5000)
+        client.admin.command("ping")
+        db = client["noshowiq"]  # database name
+        print("Connected to MongoDB.")
+    except Exception as exc:
+        print(f"Warning: Unable to connect to MongoDB ({exc}). Continuing without database.")
+        db = None
 
 # Step 4: Train the model
 print("Training model - this takes 1-2 minutes...")

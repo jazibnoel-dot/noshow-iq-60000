@@ -72,8 +72,9 @@ class AppointmentInput(BaseModel):
     alcoholism: int
     handcap: int
     sms_received: int
-    days_in_advance: int
-    hour_of_booking: int
+    scheduled_day: datetime
+    appointment_day: datetime
+    gender: str | None = None
 
 
 @app.get("/health")
@@ -117,8 +118,24 @@ def predict(record: AppointmentInput):
     # Convert input object to dictionary
     input_dict = record.dict()
 
+    # Compute model features from appointment timestamps
+    days_in_advance = int((input_dict["appointment_day"] - input_dict["scheduled_day"]).days)
+    hour_of_booking = input_dict["scheduled_day"].hour
+
+    feature_dict = {
+        "age": input_dict["age"],
+        "days_in_advance": days_in_advance,
+        "hour_of_booking": hour_of_booking,
+        "scholarship": input_dict["scholarship"],
+        "hipertension": input_dict["hipertension"],
+        "diabetes": input_dict["diabetes"],
+        "alcoholism": input_dict["alcoholism"],
+        "handcap": input_dict["handcap"],
+        "sms_received": input_dict["sms_received"],
+    }
+
     # Convert dictionary to DataFrame (model expects this format)
-    df = pd.DataFrame([input_dict])
+    df = pd.DataFrame([feature_dict])
 
     # Get prediction result
     result = model_predict(model, df)
