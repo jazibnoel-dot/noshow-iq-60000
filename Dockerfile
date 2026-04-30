@@ -10,7 +10,7 @@ COPY --from=builder /usr/local/lib/python3.11/site-packages /usr/local/lib/pytho
 COPY --from=builder /usr/local/bin /usr/local/bin
 COPY . .
 RUN pip install --no-cache-dir -e .
-RUN mkdir -p models && python train.py
+RUN mkdir -p models 
 USER appuser
 EXPOSE 7860
 CMD ["uvicorn", "noshow_iq.api:app", "--host", "0.0.0.0", "--port", "7860"]
