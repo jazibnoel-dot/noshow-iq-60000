@@ -238,3 +238,12 @@ def stats():
         "average_probability": 0.0,
         "last_trained": None
     }
+@app.on_event("startup")
+def load_model_on_startup():
+    global model
+    from noshow_iq.model import load_model
+    try:
+        model = load_model()
+        print("✅ Model loaded")
+    except Exception as e:
+        print("❌ Model load failed:", e)
