@@ -8,7 +8,9 @@ from sklearn.metrics import classification_report
 from sklearn.model_selection import train_test_split
 
 # Path where the trained model will be saved
-MODEL_PATH = Path("models") / "noshow_model.joblib"
+import os
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+MODEL_PATH = os.path.join(BASE_DIR, "models", "noshow_model.joblib")
 
 # List of features used for training and prediction
 FEATURE_COLS = [
