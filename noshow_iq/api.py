@@ -69,6 +69,10 @@ def startup_event():
         print("✓ Model loaded successfully")
     except Exception as e:
         print(f"✗ Warning: Could not load model on startup: {e}")
+
+@app.get("/")
+def root():
+    return {"message": "NoShowIQ API is running", "docs": "/docs"}
 # ─────────────────────────────────────────────────────────────────────────────
 
 
