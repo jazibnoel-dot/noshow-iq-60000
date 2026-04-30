@@ -64,7 +64,6 @@ target/
 *.rdb
 
 # Keep serialized model artifacts out of git
-# models/noshow_model.joblib
 
 # Pycharm
 .idea
@@ -91,7 +90,6 @@ target/
 # Mypy cache
 .mypy_cache/
 .env
-# *.joblib
 __pycache__/
 .pytest_cache/
 dist/
